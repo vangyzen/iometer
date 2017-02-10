@@ -106,7 +106,7 @@
 /* ##                                                                     ## */
 /* ######################################################################### */
 #define PERFORMANCE_DETAILS	0	// Turn on to display additional performance messages.
-#if defined(IOMTR_OS_LINUX)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_FREEBSD)
 
 #include <sys/time.h>
 #include <assert.h>

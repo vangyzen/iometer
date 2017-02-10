@@ -141,7 +141,7 @@ BOOL Port::IsOperationComplete(OVERLAPPED * olap)
 	}
 
 	if (olap->hEvent) {
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 		cout << "Async Port objects not supported on UNIX or NetWare" << endl;
 		return FALSE;
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)

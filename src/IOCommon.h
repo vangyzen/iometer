@@ -178,7 +178,7 @@
     (!defined(IOMTR_OS_LINUX) && !defined(IOMTR_OS_NETWARE) && !defined(IOMTR_OS_OSX) && !defined(IOMTR_OS_SOLARIS) && !defined(IOMTR_OS_WIN32) &&  defined(IOMTR_OS_WIN64))
  // nop
 #else    
- #error ===> ERROR: You have to define exactly one IOMTR_OS_* global define!
+// #error ===> ERROR: You have to define exactly one IOMTR_OS_* global define!
 #endif
 // ----------------------------------------------------------------------------
 // Check the Processor mapping
@@ -253,13 +253,15 @@ using namespace std;
 #endif
 // ----------------------------------------------------------------------------
 #if defined(IOMTR_OSFAMILY_UNIX)
- #include <sys/timeb.h>
+ #if !defined(IOMTR_OS_FREEBSD)
+  #include <sys/timeb.h>
+ #endif
  #include <unistd.h>
  #include <pthread.h>
  #include <signal.h>
  #include <netinet/in.h>   // in_addr_t
 
- #if defined(IOMTR_OS_OSX)
+ #if defined(IOMTR_OS_OSX) || defined(IOMTR_OS_FREEBSD)
   #include <sys/aio.h>
   #define aiocb64 		aiocb
   #define aio_suspend64		aio_suspend
@@ -276,7 +278,7 @@ using namespace std;
    #include <libaio.h>
   #endif
  #else
-  #error ===> ERROR: You have to define exactly one IOMTR_CPU_* global define!
+  #error ===> ERROR: You have to define exactly one IOMTR_OS_* global define!
  #endif
 
  #if defined(IOMTR_OS_LINUX)
@@ -1055,7 +1057,7 @@ inline int IsBigEndian(void)
   #define _millitm		millitm
   #define Sleep(x)		delay((x))
  #elif defined(IOMTR_OSFAMILY_UNIX)
-  #if defined(IOMTR_OS_OSX)
+  #if defined(IOMTR_OS_OSX) || defined(IOMTR_OS_FREEBSD)
    #define _timeb		timeval
    #define _ftime(x)		gettimeofday(x,NULL)
    #define _time		tv_sec
@@ -1171,7 +1173,7 @@ inline int IsBigEndian(void)
 #endif
 // ----------------------------------------------------------------------------
 //#if defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
-#if defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
  extern "C" DWORDLONG timer_value();
 #endif
 // ----------------------------------------------------------------------------

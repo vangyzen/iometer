@@ -99,7 +99,7 @@
 #define SECTOR_SIZE						512
 #if defined(IOMTR_OS_SOLARIS)
 #define RAW_DEVICE_DIR					"/dev/rdsk"
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_FREEBSD)
 #define RAW_DEVICE_DIR					"/dev"
 #else
 #warning ===> WARNING: You have to do some coding here to get the port done!

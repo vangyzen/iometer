@@ -93,7 +93,7 @@
 
 #include <netinet/in.h>
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 #include <net/if.h>
 #endif
 
@@ -190,7 +190,7 @@ class Performance {
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 	DWORDLONG timediff;
 
-#elif defined(IOMTR_OS_OSX)
+#elif defined(IOMTR_OS_OSX) || defined(IOMTR_OS_FREEBSD)
 	double timediff;
 	char nic_names[MAX_NUM_INTERFACES][IFNAMSIZ];
 #else
@@ -215,7 +215,7 @@ class Performance {
 	double Calculate_Stat(__int64 start_value, __int64 end_value, DWORD counter_type);
 #endif
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	void Get_CPU_Counters(int snapshot);
 	void Get_NI_Counters(int snapshot);
 	void Get_TCP_Counters(int snapshot);

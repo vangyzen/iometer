@@ -128,7 +128,7 @@ BOOL CQAIO::SetQueueSize(int size)
 {
 	struct IOCQ *this_cqid = (struct IOCQ *)completion_queue;
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	this_cqid->element_list = (struct CQ_Element *)malloc(sizeof(CQ_Element) * size);
 #elif defined(IOMTR_OS_NETWARE)
 	this_cqid->element_list = (struct CQ_Element *)NXMemAlloc(sizeof(CQ_Element) * size, 1);
@@ -139,7 +139,7 @@ BOOL CQAIO::SetQueueSize(int size)
 		cout << "memory allocation failed." << endl;
 		return (FALSE);
 	}
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	this_cqid->aiocb_list = (struct aiocb64 **)malloc(sizeof(struct aiocb64 *) * size);
 #ifdef IOMTR_SETTING_LINUX_LIBAIO
         this_cqid->iocb_list = (struct iocb **)malloc(sizeof(struct iocb *) * size);
@@ -152,7 +152,7 @@ BOOL CQAIO::SetQueueSize(int size)
 #endif
 	if (this_cqid->aiocb_list == NULL) {
 		cout << "memory allocation failed." << endl;
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 		free(this_cqid->element_list);
 #ifdef IOMTR_SETTING_LINUX_LIBAIO
 		if (this_cqid->iocb_list != NULL) {

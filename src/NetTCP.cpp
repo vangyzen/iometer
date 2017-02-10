@@ -87,7 +87,7 @@
  #else
   #include "mswsock.h"
  #endif
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_NETWARE)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_FREEBSD)
  #include <sys/socket.h>
 
  #if defined(IOMTR_OS_NETWARE)
@@ -591,7 +591,7 @@ ReturnVal NetAsyncTCP::WaitForDisconnect()
 
 #if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 	if ( client_socket == INVALID_SOCKET )
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	if ( fp->fd == (int)INVALID_SOCKET )
 #else
  #warning ===> WARNING: You have to do some coding here to get the port done! 
@@ -680,7 +680,7 @@ ReturnVal NetAsyncTCP::Receive( LPVOID buffer, DWORD bytes, LPDWORD return_value
 	// Do the read.
 	if ( WSARecv( (client_socket), &wsa_buf, 1, return_value, &flags, 
 		asynchronous_io, NULL ) == 0 )
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	if ( ReadFile( client_socket, buffer, bytes, return_value, asynchronous_io ) )
 #elif defined(IOMTR_OS_NETWARE)
 	if ( *return_value = read( (int)client_socket, buffer, (unsigned int)bytes) )
@@ -739,7 +739,7 @@ ReturnVal NetAsyncTCP::Send( LPVOID buffer, DWORD bytes, LPDWORD return_value,
 	// Do the write.
 	if ( WSASend( (client_socket), &wsa_buf, 1, return_value, NULL, 
 			asynchronous_io, NULL ) == 0 )
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	if ( WriteFile( client_socket, buffer, bytes, return_value, asynchronous_io ) )
 #elif defined(IOMTR_OS_NETWARE)
 	if ( *return_value = write( (int)client_socket, (void *)buffer, (unsigned int)bytes) )
@@ -791,7 +791,7 @@ DWORD NetAsyncTCP::Peek()
 	char buf[1];
 	int res = 0, t = 0;
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	res = (int)recv(((struct File *)client_socket)->fd, buf, sizeof(buf), MSG_PEEK);
 	if (res > 0) {
 		bytes_available = res;
@@ -832,7 +832,7 @@ ReturnVal NetAsyncTCP::CloseSocket( CONNECTION *s )
 		cout << "Closing socket." << endl;
 	#endif
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	if ( ((struct File *)*s)->fd == (int)INVALID_SOCKET )
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 	if ( *s == INVALID_SOCKET )
@@ -850,7 +850,7 @@ ReturnVal NetAsyncTCP::CloseSocket( CONNECTION *s )
 		cout << "Closing socket." << endl;
 	#endif
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	WSASetLastError(0);
 	if ( close ( ((struct File *)*s)->fd ) != 0 )
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
@@ -865,7 +865,7 @@ ReturnVal NetAsyncTCP::CloseSocket( CONNECTION *s )
 		return ReturnError;
 	}
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	((struct File *)*s)->fd = (int)INVALID_SOCKET;
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 	*s = INVALID_SOCKET;

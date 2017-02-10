@@ -1,0 +1,71 @@
+#
+# Dynamo Makefile for FreeBSD on amd64
+#
+
+RM=/bin/rm -f
+CXX=/usr/bin/c++
+
+# -DWORKAROUND_MOD_BUG can be dropped if -O is used in place of -g in CFLAGS.
+#
+# -D_DETAILS=1 -D_DEBUG enables maximum debug information
+#
+# -DIOMTR_SETTING_GCC_M64 allows for the gcc -m64 flag that makes longs
+# 64 bits and pointers 64 bits. This forces changes in data structures
+# and type definitions for compatibility with a Win32 Iometer.
+#
+# -DIOMTR_SETTING_LINUX_LIBAIO enables using libaio for better handling of AIO
+
+CFLAGS=	-O \
+	-Wall \
+	-DIOMTR_OSFAMILY_UNIX \
+	-DIOMTR_OS_FREEBSD \
+	-DIOMTR_CPU_X86_64 \
+	-DIOMTR_SETTING_GCC_M64 \
+	-DNOMINMAX \
+	-DUSE_NEW_DISCOVERY_MECHANISM \
+	-DFORCE_STRUCT_ALIGN \
+
+#	-DIOMTR_SETTING_CPU_AFFINITY
+#	-DIOMTR_SETTING_LINUX_LIBAIO
+#	-D_GNU_SOURCE
+
+LDFLAGS=-lpthread
+
+OBJECTS= \
+	IOGlobals.o \
+	Pulsar.o \
+	IOManager.o \
+	IOManagerFreeBSD.o \
+	IOGrunt.o \
+	IOTarget.o \
+	IOTargetDisk.o \
+	IOTargetTCP.o \
+	IOPort.o \
+	IOPortTCP.o \
+	Network.o \
+	NetTCP.o \
+	ByteOrder.o \
+	IOPerformanceFreeBSD.o \
+	IOTime.o \
+	IOCQAIO.o \
+	IOCompletionQ.o \
+	IOAccess.o
+
+all: dynamo
+
+dynamo: $(OBJECTS)
+	$(CXX) $(CFLAGS) -o dynamo $(OBJECTS) $(LIBS) $(LDFLAGS)
+	@echo WARNING
+	@echo WARNING Do not expect dynamo to do anything useful yet.
+	@echo WARNING
+
+clean:
+	$(RM) $(OBJECTS) dynamo
+
+.cpp.o:
+	$(CXX) $(CFLAGS) -c $<
+
+.c.o:
+	$(CXX) $(CFLAGS) -c $<
+
+# vim: noet sts=8 sw=8

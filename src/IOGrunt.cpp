@@ -593,7 +593,7 @@ BOOL Grunt::Set_Access(const Test_Spec * spec)
 		free(read_data);
 	}
 	errno = 0;
-#if defined(IOMTR_OS_LINUX)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_FREEBSD)
 	if (posix_memalign(&read_data, sysconf(_SC_PAGESIZE), access_spec.max_transfer))
 #elif defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_OSX)
 	if (!(read_data = valloc(access_spec.max_transfer)))
@@ -627,7 +627,7 @@ BOOL Grunt::Set_Access(const Test_Spec * spec)
 		free(write_data);
 	}
 	errno = 0;
-#if defined(IOMTR_OS_LINUX)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_FREEBSD)
         if (posix_memalign(&write_data, sysconf(_SC_PAGESIZE), access_spec.max_transfer))
 #elif defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_OSX)
         if (!(write_data = valloc(access_spec.max_transfer)))
@@ -1588,6 +1588,8 @@ void Grunt::Begin_IO()
 		sleep(0);
 #elif defined(IOMTR_OS_OSX)
 		pthread_yield_np();
+#elif defined(IOMTR_OS_FREEBSD)
+		pthread_yield();
 #else
 #warning ===> WARNING: You have to do some coding here to get the port done!
 #endif
@@ -1614,7 +1616,7 @@ void Grunt::Begin_IO()
 //
 // When we use gcc, we add "LL" to take out a warning about integer overflow.
 //
-#if defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 #define A 136204069LL		// 3x7x11x13x17x23x   29x4 + 1
 #define B 28500701229LL		// 3x7x11x13x17x23x27x29x31
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)

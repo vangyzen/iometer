@@ -103,7 +103,7 @@
 #define SOCKET	int
 #endif
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD) 
  // nop
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 #define socklen_t int

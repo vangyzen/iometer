@@ -78,7 +78,7 @@
 #include "Network.h"
 #if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 #include "winsock2.h"
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD) 
 #include <sys/time.h>
 #include <unistd.h>
 #include <sys/socket.h>
@@ -93,7 +93,7 @@ typedef struct linger LINGER;
 #warning ===> WARNING: You have to do some coding here to get the port done!
 #endif
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD) 
  // nop
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 #define socklen_t int

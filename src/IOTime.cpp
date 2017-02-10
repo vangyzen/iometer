@@ -486,6 +486,19 @@ uint64_t rdtsc()
 #endif
 
 // ----------------------------------------------------------------------------
+#elif defined(IOMTR_OS_FREEBSD)
+#if defined(IOMTR_CPU_I386) || defined(IOMTR_CPU_X86_64)
+DWORDLONG timer_value(void)
+{
+	// Original code (returning the cpu cycle counter)
+	unsigned int lo, hi;
+	__asm__ __volatile__("rdtsc":"=a"(lo), "=d"(hi));
+
+	return (lo | ((DWORDLONG) hi << 32));
+}
+#else
+#error ===> ERROR: You have to do some coding here to get the port done!
+#endif
 #else
 #error ===> ERROR: You have to do some coding here to get the port done!
 #endif

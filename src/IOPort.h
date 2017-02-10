@@ -74,13 +74,13 @@
 #ifndef PORT_DEFINED
 #define PORT_DEFINED
 
+#include <sstream>
+
 #if defined(IOMTR_OSFAMILY_WINDOWS) || defined(IOMTR_OSFAMILY_NETWARE)
 namespace std {
 }
 #endif
 using namespace std;
-
-#include <sstream>
 
 #include "IOCommon.h"
 #include "IOMessage.h"

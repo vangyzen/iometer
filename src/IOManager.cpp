@@ -109,7 +109,7 @@
 
 #if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 #include "winsock2.h"
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -185,7 +185,8 @@ Manager::~Manager()
 
 	Delete_Random_Data();
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
+	// TODO IOMTR_OSFAMILY_UNIX instead?
 	if (data != NULL)
 		free(data);
 	if (swap_devices != NULL)
@@ -254,7 +255,7 @@ BOOL Manager::Login(char* port_name, int login_port_number)
 		strcpy(data_msg->data.manager_info.names[0], manager_name);
 		name_size = strlen(manager_name);
 	} else {
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OSFAMILY_UNIX)
 		// This will not work correctly if hostname length > MAX_NETWORK_NAME
 		if (gethostname(manager_name, name_size) < 0) {
 			cout << "*** Exiting... gethostname() returned error " << errno << endl;
@@ -1072,7 +1073,7 @@ void Manager::GenerateRandomData()
 					randomDataBuffers[SeedVal] = NXMemAlloc(RANDOM_BUFFER_SIZE, 1);
 
 #elif defined(IOMTR_OSFAMILY_UNIX)
-#if defined(IOMTR_OS_LINUX)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_FREEBSD)
 					posix_memalign((void **)&randomDataBuffers[SeedVal], sysconf(_SC_PAGESIZE), RANDOM_BUFFER_SIZE);
 
 #elif defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_OSX)
@@ -1120,7 +1121,7 @@ void Manager::Delete_Random_Data()
 
 		for ( it=randomDataBuffers.begin() ; it != randomDataBuffers.end(); it++ )
 		{
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 			free((*it).second);
 
 #elif defined(IOMTR_OS_NETWARE)
@@ -1307,7 +1308,7 @@ BOOL Manager::Set_Access(int target, const Test_Spec * spec)
 	// Align all data transfers on a page boundary.  This will work for all disks
 	// with sector sizes that divide evenly into the page size - which is always
 	// the case.
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	free(data);
 	errno = 0;
 	if (!(data = valloc(grunts[target]->access_spec.max_transfer)))

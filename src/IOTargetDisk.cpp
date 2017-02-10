@@ -152,7 +152,7 @@
 #include <sys/vfs.h>
 #endif
 
-#if defined(IOMTR_OS_OSX)
+#if defined(IOMTR_OS_OSX) || defined(IOMTR_OS_FREEBSD)
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <sys/mount.h>
@@ -234,7 +234,7 @@ BOOL TargetDisk::Initialize(Target_Spec * target_info, CQ * cq)
 	else if (IsType(target_info->type, PhysicalDiskType))
 		retval = Init_Physical(atoi(spec.name + 14));
 #endif
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	if (IsType(target_info->type, LogicalDiskType))
 		retval = Init_Logical(spec.name);
 	else if (IsType(target_info->type, PhysicalDiskType))
@@ -309,7 +309,7 @@ BOOL TargetDisk::Init_Logical(char *drive)
 	// Getting size information about the drive.
 	return (Set_Sizes());
 }
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 // UNIX logical drives are accessed through path names.
 BOOL TargetDisk::Init_Logical(char *drive)
 {
@@ -417,7 +417,7 @@ BOOL TargetDisk::Init_Physical(char *drive)
 	// Getting information about the size of the drive.
 	return (Set_Sizes());
 }
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 BOOL TargetDisk::Init_Physical(char *drive)
 {
 	// Setting the spec.name of the drive.
@@ -1085,7 +1085,7 @@ BOOL TargetDisk::Set_Sizes(BOOL open_disk)
 		return FALSE;
 	}
 }
-#elif defined(IOMTR_OS_OSX)
+#elif defined(IOMTR_OS_OSX) || defined(IOMTR_OS_FREEBSD)
 int TargetDisk::Set_Sizes(BOOL open_disk)
 {
 	struct statfs st;
@@ -1138,6 +1138,7 @@ int TargetDisk::Set_Sizes(BOOL open_disk)
 
 		fd = ((struct File *)disk_file)->fd;
 
+#if defined(IOMTR_OS_OSX)
 		if (ioctl(fd, DKIOCGETBLOCKSIZE, &spec.disk_info.sector_size) < 0) {
 			spec.disk_info.sector_size = 0;
 		}
@@ -1145,6 +1146,11 @@ int TargetDisk::Set_Sizes(BOOL open_disk)
 		if (ioctl(fd, DKIOCGETBLOCKCOUNT, &size) < 0) {
 			size = 0;
 		}
+#else
+		// TODO
+		spec.disk_info.sector_size = 0;
+		size = 0;
+#endif
 
 		size *= spec.disk_info.sector_size;
 
@@ -1586,6 +1592,8 @@ BOOL TargetDisk::Open(volatile TestState * test_state, int open_flag)
 		((struct File *)disk_file)->type = LogicalDiskType;
 #elif defined(IOMTR_OS_OSX)
 		((struct File *)disk_file)->fd = open(file_name, O_RDWR | O_CREAT | open_flag, S_IRUSR | S_IWUSR);
+#elif defined(IOMTR_OS_FREEBSD)
+		((struct File *)disk_file)->fd = open(file_name, O_DIRECT | O_RDWR | O_CREAT | open_flag, S_IRUSR | S_IWUSR);
 #elif defined(IOMTR_OS_SOLARIS)
 		((struct File *)disk_file)->fd =
 		    open(file_name, O_RDWR | O_CREAT | O_LARGEFILE | open_flag, S_IRUSR | S_IWUSR);
@@ -1620,6 +1628,8 @@ BOOL TargetDisk::Open(volatile TestState * test_state, int open_flag)
 		((struct File *)disk_file)->fd = NWOpenDevice(atoi(file_name), 0);
 #elif defined(IOMTR_OS_OSX)
 		((struct File *)disk_file)->fd = open(file_name, O_RDWR, S_IRUSR | S_IWUSR);
+#elif defined(IOMTR_OS_FREEBSD)
+		((struct File *)disk_file)->fd = open(file_name, O_DIRECT | O_RDWR, S_IRUSR | S_IWUSR);
 #elif defined(IOMTR_OS_SOLARIS)
 		((struct File *)disk_file)->fd = open(file_name, O_RDWR | O_LARGEFILE, S_IRUSR | S_IWUSR);
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
@@ -1641,7 +1651,7 @@ BOOL TargetDisk::Open(volatile TestState * test_state, int open_flag)
 #endif
 #if defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 	if (disk_file == INVALID_HANDLE_VALUE)
-#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#elif defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	if (((struct File *)disk_file)->fd == (int)INVALID_SOCKET)
 #else
 #warning ===> WARNING: You have to do some coding here to get the port done!
@@ -1667,7 +1677,7 @@ BOOL TargetDisk::Close(volatile TestState * test_state)
 	// Note that test_state is not used.  It IS used by network targets.
 
 	// If testing connection rate, the disk may already be closed.
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	if (((struct File *)disk_file)->fd == (int)INVALID_SOCKET)
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 	if (disk_file == INVALID_HANDLE_VALUE)
@@ -1685,7 +1695,7 @@ BOOL TargetDisk::Close(volatile TestState * test_state)
 	cout << "Closing disk " << spec.name << endl;
 #endif
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	if (!CloseHandle(disk_file, FILE_ELEMENT))
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 	if (!CloseHandle(disk_file))
@@ -1699,7 +1709,7 @@ BOOL TargetDisk::Close(volatile TestState * test_state)
 		return FALSE;
 	}
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_NETWARE) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 	((struct File *)disk_file)->fd = (int)INVALID_SOCKET;
 #elif defined(IOMTR_OS_WIN32) || defined(IOMTR_OS_WIN64)
 	disk_file = INVALID_HANDLE_VALUE;
@@ -2165,3 +2175,5 @@ static unsigned long long getSizeOfPhysDisk(const char *devName)
 
 #endif				// Linux
 #endif				// UNIX
+
+// vim: noet sts=8 sw=8

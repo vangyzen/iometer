@@ -100,6 +100,8 @@
 #define DEFAULT_EXCLUDE_FILESYS   "proc specfs config"
 #elif defined(IOMTR_OS_OSX)
 #define DEFAULT_EXCLUDE_FILESYS   "devfs nfs fdesc afpfs"
+#elif defined(IOMTR_OS_FREEBSD)
+#define DEFAULT_EXCLUDE_FILESYS   "devfs nfs fdescfs procfs tmpfs nullfs unionfs"
 #else
 #warning ===> WARNING: You have to do some coding here to get the port done!
 #endif

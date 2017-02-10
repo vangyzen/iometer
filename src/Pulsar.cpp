@@ -141,7 +141,7 @@ extern timer_type TimerType;
 #include <ctype.h>
 #if defined(IOMTR_OS_LINUX)
 int kstatfd;
-#elif defined(IOMTR_OS_OSX)
+#elif defined(IOMTR_OS_OSX) || defined(IOMTR_OS_FREEBSD)
 // nop
 #elif defined(IOMTR_OS_SOLARIS)
 #include <synch.h>
@@ -231,7 +231,7 @@ void CleanupCCNTInterface(int fd)
 
 
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 int check_dev(char *devname)
 {
 	struct stat buf;
@@ -472,7 +472,7 @@ int CDECL main(int argc, char *argv[])
 	// cout << endl;
 
 #if defined(IOMTR_OSFAMILY_UNIX)
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX)
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_FREEBSD)
 	signal(SIGALRM, SIG_IGN);
 #elif defined(IOMTR_OS_SOLARIS)
 	sigignore(SIGALRM);
@@ -901,7 +901,7 @@ static void ParseParam(int argc, char *argv[], struct dynamo_param *param)
 		}
 #endif
 
-#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS)			
+#if defined(IOMTR_OS_LINUX) || defined(IOMTR_OS_OSX) || defined(IOMTR_OS_SOLARIS) || defined(IOMTR_OS_FREEBSD)
 		if (strcasecmp(pcOption, "D") == 0) {
 			if (check_dev(argv[I])) {
 				Syntax("Not a valid device.");
